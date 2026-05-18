@@ -44,7 +44,7 @@ public class MapManager : MonoBehaviour
                         var overlayTile = Instantiate(overlayTilePrefab, overlayParent.transform);
                         var cellWorldPosition = walkableMap.layoutGrid.GetCellCenterWorld(tileLocation);
 
-                        overlayTile.transform.position = new Vector3(cellWorldPosition.x, cellWorldPosition.y + 0.5f, cellWorldPosition.z);
+                        overlayTile.transform.position = new Vector3(cellWorldPosition.x, cellWorldPosition.y - 0.125f, cellWorldPosition.z);
                         overlayTile.name = $"{x},{y}"; //for ease of viewing in the inspector
                         overlayTile.GetComponent<SpriteRenderer>().sortingLayerName = "Floor Highlight";
                         overlayTile.gridLocation = new Vector2Int(x,y); //insert the X and Y location
@@ -72,8 +72,9 @@ public class MapManager : MonoBehaviour
         List<Vector2> cornerPoints = BuildPathCorners(tiles);
         DrawPathLine(cornerPoints);
 
-        GameObject arrowHead = Instantiate(pathArrowHead, arrowParent);
-        arrowHead.transform.position = tiles[tiles.Count - 1].transform.position;
+        //temporarily disabling arrow head since it looks like ass
+        //GameObject arrowHead = Instantiate(pathArrowHead, arrowParent);
+        //arrowHead.transform.position = tiles[tiles.Count - 1].transform.position;
     }
 
     List<Vector2> BuildPathCorners(List<OverlayTile> tiles)
@@ -103,7 +104,6 @@ public class MapManager : MonoBehaviour
         corners.Add(tiles[tiles.Count - 1].transform.position);
         return corners;
     }
-
     void DrawPathLine(List<Vector2> cornerPoints)
     {
         if (cornerPoints.Count < 2)
@@ -122,8 +122,8 @@ public class MapManager : MonoBehaviour
         lineRenderer.endWidth = pathLineWidth;
         lineRenderer.sortingLayerName = pathLineSortingLayer;
         lineRenderer.useWorldSpace = true;
-        lineRenderer.numCapVertices = 4;
-        lineRenderer.numCornerVertices = 4;
+        lineRenderer.numCapVertices = 0;
+        lineRenderer.numCornerVertices = 0;
         lineRenderer.positionCount = cornerPoints.Count;
 
         Vector3[] linePoints = new Vector3[cornerPoints.Count];
@@ -134,7 +134,6 @@ public class MapManager : MonoBehaviour
 
         lineRenderer.SetPositions(linePoints);
     }
-
     static void DestroyAllChildrenOfGameobject(GameObject go)
     {
         for(int i = go.transform.childCount - 1; i >=0; i--)

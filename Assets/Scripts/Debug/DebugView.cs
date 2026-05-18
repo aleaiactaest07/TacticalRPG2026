@@ -7,7 +7,7 @@ public class DebugView : MonoBehaviour
     public static DebugView i;
     
     [SerializeField] GameObject debugViewParent;
-    [SerializeField] TMP_Text tilePosition;
+    [SerializeField] TMP_Text debugText;
     private bool debugViewActive = false;
 
     void Awake()
@@ -30,8 +30,8 @@ public class DebugView : MonoBehaviour
         debugViewParent.gameObject.SetActive(debugViewActive);
     }
 
-    public void updateTilePositionText(Vector3 position)
+    public void updateDebugViewText(string text)
     {
-        tilePosition.text = $"({position.x}, {position.y})";
+        debugText.text = text;
     }
 }

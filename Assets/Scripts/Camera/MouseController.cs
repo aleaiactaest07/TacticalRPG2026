@@ -8,6 +8,9 @@ public class MouseController : MonoBehaviour
 
     private OverlayTile cachedTileTest;
 
+    private OverlayTile rightClickedTile;
+    private OverlayTile movementSourceTile;
+
     void Awake()
     {
         pathFinder = new PathFinder();
@@ -35,11 +38,13 @@ public class MouseController : MonoBehaviour
             {
                 cachedTileTest = overlayTile.GetComponent<OverlayTile>(); //assign the cached tile test
                 cachedTileTest?.ShowTile();
+
+                movementSourceTile = overlayTile.GetComponent<OverlayTile>();
             }
             if (Mouse.current.rightButton.wasReleasedThisFrame && cachedTileTest != null)
             {
                 //generate a path from the cursorHighlightSprite.position to the clicked position
-                OverlayTile rightClickedTile = overlayTile.GetComponent<OverlayTile>();
+                rightClickedTile = overlayTile.GetComponent<OverlayTile>();
                 var path = pathFinder.FindPath(cachedTileTest, rightClickedTile);
 
                 // foreach(var tile in path)
