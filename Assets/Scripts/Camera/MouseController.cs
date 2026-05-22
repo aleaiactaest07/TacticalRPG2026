@@ -79,7 +79,7 @@ public class MouseController : MonoBehaviour
                 WorldObjectPreviewUI.i.hideMenu();
             }
         }
-        if (Mouse.current.rightButton.wasReleasedThisFrame && hoveredTile != null)
+        else if (Mouse.current.rightButton.wasReleasedThisFrame && hoveredTile != null)
         {
             //check if there is a chraracterToMove, and if this square is empty. Then move the unit if there is a path.
             //TODO: if the characterToMove is a ranged unit, then check line of sight logic or something. Would just be an else statement or something
@@ -88,6 +88,14 @@ public class MouseController : MonoBehaviour
                 //make the move order for the characterToMove and make sure to handle the restingObject logic.
                 StartCoroutine(MoveCharacter());
             }
+        }
+        else if (battleState == BattleState.CheckingLOS && clickedTile != null && hoveredTile != null)
+        {
+            MapManager.i.UpdateLOSIndicator(clickedTile, hoveredTile);
+        }
+        else if (Keyboard.current.rKey.wasPressedThisFrame && battleState == BattleState.UnitSelected)
+        {
+            updateBattleState?.Invoke(BattleState.CheckingLOS);
         }
     }
     public RaycastHit2D? GetFocusedOnTile()

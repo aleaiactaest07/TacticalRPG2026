@@ -61,12 +61,8 @@ public class DestructibleObject : MonoBehaviour, ObjectHP
         return canWalkThrough;
     }
 
-    public string exposeObjectInfo(out Sprite windowSprite, out string description, out float healthPercentage, out int maxHealth)
+    public WorldObjectPreviewData exposeObjectInfo()
     {
-        description = objectDescription;
-        windowSprite = spriteRenderer.sprite;
-        healthPercentage = (float)currentHealth / (float)this.maxHealth;
-        maxHealth = this.maxHealth;
-        return objectName;
+        return new WorldObjectPreviewData(objectName, spriteRenderer.sprite, objectDescription, (float)currentHealth / (float)maxHealth, maxHealth);
     }
 }

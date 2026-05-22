@@ -23,17 +23,13 @@ public class WorldObjectPreviewUI : MonoBehaviour
 
     public void displayObject(MapObject mapObject)
     {
-        Sprite portrait;
-        string description;
-        float healthPercentage;
-        int maxHealth;
-        headerText.text = mapObject.exposeObjectInfo(out portrait, out description, out healthPercentage, out maxHealth); //assigns all datatypes without constructing a new class or multiple getters
+        WorldObjectPreviewData data = mapObject.exposeObjectInfo(); //assigns all datatypes without constructing a new class or multiple getters
 
-        portraitRenderer.sprite = portrait;
-        descriptionText.text = description;
+        portraitRenderer.sprite = data.portrait;
+        descriptionText.text = data.description;
 
-        hpBarFill.rectTransform.localScale = new Vector3(healthPercentage, 1, 1); //set the fill to match the current HP value
-        healthText.text = $"{(int)(healthPercentage * maxHealth)}/{maxHealth} HP"; //set the text value of the health text
+        hpBarFill.rectTransform.localScale = new Vector3(data.healthPercentage, 1, 1); //set the fill to match the current HP value
+        healthText.text = $"{(int)(data.healthPercentage * data.maxHealth)}/{data.maxHealth} HP"; //set the text value of the health text
 
         graphicsParent.gameObject.SetActive(true);
     }
@@ -41,5 +37,25 @@ public class WorldObjectPreviewUI : MonoBehaviour
     public void hideMenu()
     {
         graphicsParent.gameObject.SetActive(false);
+    }
+}
+
+/// <summary>
+/// a class that is passed to populate the UI for the worldObjectPreviewData.
+/// </summary>
+public class WorldObjectPreviewData
+{
+    public string objectName;
+    public Sprite portrait;
+    public string description;
+    public float healthPercentage;
+    public int maxHealth;
+    public WorldObjectPreviewData(string objectName, Sprite portrait, string description, float healthPercentage, int maxHealth)
+    {
+        this.objectName = objectName;
+        this.portrait = portrait;
+        this.description = description;
+        this.healthPercentage = healthPercentage;
+        this.maxHealth = maxHealth;
     }
 }

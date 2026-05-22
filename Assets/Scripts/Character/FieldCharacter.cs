@@ -114,14 +114,6 @@ public class FieldCharacter : MonoBehaviour, ObjectHP
     }
     #endregion
     #region MapObject and HP implementation
-    public string exposeObjectInfo(out Sprite windowSprite, out string description, out float healthPercentage, out int maxHealth)
-    {
-        windowSprite = unit._base.PortraitSprite;
-        description = unit._base.UnitDescription;
-        healthPercentage = (float)UnitHP / (float) MaxUnitHP;
-        maxHealth = (int)MaxUnitHP;
-        return unit._base.UnitName;
-    }
     public IEnumerator TakeDamage(int taken)
     {
         throw new NotImplementedException();
@@ -134,6 +126,11 @@ public class FieldCharacter : MonoBehaviour, ObjectHP
 
     private void FieldUnitDeath(){
         
+    }
+
+    public WorldObjectPreviewData exposeObjectInfo()
+    {
+        return new WorldObjectPreviewData(unit._base.UnitName, unit._base.PortraitSprite, unit._base.UnitDescription, (float)UnitHP / (float) MaxUnitHP, (int)MaxUnitHP);
     }
 
     #endregion

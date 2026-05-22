@@ -9,7 +9,7 @@ public interface MapObject
     /// Exposes data for the relevant popup menu formatted depending on the type of object (destructible wall, character, etc.). Also outputs a sprite for a windowed view UI
     /// </summary>
     /// <returns></returns>
-    public string exposeObjectInfo(out Sprite windowSprite, out string description, out float healthPercentage, out int maxHealth);
+    public WorldObjectPreviewData exposeObjectInfo();
     /// <summary>
     /// Whether or not a passerby is allowed to walk through this object in pathfinding.
     /// </summary>
