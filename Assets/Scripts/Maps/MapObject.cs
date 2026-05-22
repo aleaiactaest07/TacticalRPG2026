@@ -10,4 +10,10 @@ public interface MapObject
     /// </summary>
     /// <returns></returns>
     public string exposeObjectInfo(out Sprite windowSprite, out string description);
+    /// <summary>
+    /// Whether or not a passerby is allowed to walk through this object in pathfinding.
+    /// </summary>
+    /// <param name="passing"></param>
+    /// <returns></returns>
+    public bool allowPassthrough(FieldCharacter passing);
 }

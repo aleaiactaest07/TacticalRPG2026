@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: TestUnit
   m_EditorClassIdentifier: Assembly-CSharp::UnitBase
   unitName: Test Unit
+  unitType: 0
   combatSprites: {fileID: 11400000, guid: 4c8ef0fd2ed789c4786bb99c1dcfcc55, type: 2}
-  unitDescription: This is a description for a test unit
+  unitDescription: This is a description for a test melee unit
   portraitSprite: {fileID: -579159171533866860, guid: f87f651ba7fd3a44ab41e7cf5e7fcef6, type: 3}
   vitality: 1
   agility: 1

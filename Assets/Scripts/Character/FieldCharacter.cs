@@ -9,17 +9,17 @@ using UnityEngine;
 public class FieldCharacter : MonoBehaviour, ObjectHP
 {
     #region Fields
-    [SerializeField] OverlayTile tilePosition;
-    [SerializeField] OverlayTile targetTile;
-    [SerializeField] List<Vector2> movementOrders;
+    private OverlayTile tilePosition;
+    private OverlayTile targetTile;
+    [SerializeField] List<OverlayTile> movementOrders;
     public string internalCharacterName { get; private set; }
-
+    public string unitDisplayName {get; private set;} //determined from province of recruitment probably? like 2nd Dolebin Archers
     [SerializeField] CharacterSpriteHandler spriteHandler;
     public CharacterSpriteHandler SpriteHandler => spriteHandler;
 
     [SerializeField] UnitBase defaultBase;
     private Unit unit;
-    
+    public bool PlayerControlled; //make private set later
     private static Vector2 positionalOffset = new Vector2(0, 0.25f); //change to make it so character positions reflect properly on the isometric grid
     #endregion
     #region Setup
@@ -62,34 +62,35 @@ public class FieldCharacter : MonoBehaviour, ObjectHP
         transform.position = (Vector2)currentTile.transform.position + positionalOffset;
     }
     /// <summary>
-    /// Receives a list of corner points for movement, and then calls FollowPath to lerp to each of those points.
+    /// Receives a list of overlay tiles for movement, and then calls FollowPath to lerp to each of those tiles.
     /// </summary>
-    /// <param name="points"></param>
-    public void setMoveOrders(List<Vector2> points)
+    /// <param name="tiles"></param>
+    public IEnumerator setMoveOrders(List<OverlayTile> tiles)
     {
-        movementOrders = points;
-
-        StartCoroutine(FollowPath());
+        movementOrders = tiles;
+        yield return FollowPath();
     }
-    private float moveDuration = 0.15f;
+    [SerializeField] private float moveSpeed = 6f;
     private IEnumerator FollowPath(){ //coroutine to follow a path
         if (movementOrders == null || movementOrders.Count == 0)
         {
             yield break; //early termination
         }
 
-        foreach (var point in movementOrders)
+        foreach (var nextTile in movementOrders)
         {
-            if (!MapManager.i.TryGetOverlayTile(point, out OverlayTile nextTile))
-            {
-                Debug.LogError($"No overlay tile found at path position {point}.");
-                continue;
-            }
-
             targetTile = nextTile;
 
             Vector3 startPosition = transform.position;
             Vector3 targetPosition = nextTile.transform.position + (Vector3)positionalOffset;
+            float moveDuration = Vector3.Distance(startPosition, targetPosition) / moveSpeed;
+            if (moveDuration <= 0f)
+            {
+                transform.position = targetPosition;
+                tilePosition = nextTile;
+                continue;
+            }
+
             float elapsedTime = 0f;
 
             while (elapsedTime < moveDuration) //the actual lerp
@@ -117,5 +118,11 @@ public class FieldCharacter : MonoBehaviour, ObjectHP
     {
         throw new NotImplementedException();
     }
+
+    public bool allowPassthrough(FieldCharacter passing)
+    {
+        return passing.PlayerControlled == this.PlayerControlled; //if both are playercontrolled of both are not.
+    }
+
     #endregion
 }

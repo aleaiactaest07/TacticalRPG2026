@@ -14,6 +14,7 @@ public class DestructibleObject : MonoBehaviour, ObjectHP
     [SerializeField] SpriteEffect destructionEffect;
     [SerializeField] Vector2 startingPosition; //TODO: remove this field when proc gen is added
     [SerializeField] Vector2 positionalOffset;
+    [SerializeField] bool canWalkThrough; //if an object can be walked through in pathfinding
     private OverlayTile tilePosition;
 
     public string exposeObjectInfo(out Sprite windowSprite, out string description)
@@ -62,5 +63,10 @@ public class DestructibleObject : MonoBehaviour, ObjectHP
     void Start()
     {
         PlaceObjectOnGrid(startingPosition);
+    }
+
+    public bool allowPassthrough(FieldCharacter passing)
+    {
+        return canWalkThrough;
     }
 }

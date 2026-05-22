@@ -7,6 +7,7 @@ using UnityEngine;
 public class UnitBase : ScriptableObject
 {
     [SerializeField] string unitName;
+    [SerializeField] UnitType unitType;
     [SerializeField] CombatSpriteDepot combatSprites;
 
     [Header("Panel View Data")]
@@ -21,6 +22,7 @@ public class UnitBase : ScriptableObject
 
     //getters
     public string UnitName {get {return unitName;}}
+    public UnitType UnitType => unitType;
     public CombatSpriteDepot CombatSprites {get {return combatSprites;}}
     public string UnitDescription {get {return unitDescription;}}
     public Sprite PortraitSprite {get {return portraitSprite;}}
@@ -30,4 +32,10 @@ public class UnitBase : ScriptableObject
     public int Strength {get {return strength;}}
     public int Dexterity {get {return dexterity;}}
     public int Tactics {get {return tactics;}}
+}
+
+public enum UnitType
+{
+    Melee,
+    Ranged
 }

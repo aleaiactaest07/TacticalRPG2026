@@ -19,7 +19,7 @@ public class BattleManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Setter for battle state. Not called directly. Use event Action<BattleState> instead.
+    /// Setter for battle state. Not to be called directly (to avoid a circular dependency). Invoke an event instead.
     /// </summary>
     /// <param name="state"></param>
     private void UpdateBattleState(BattleState state)
@@ -30,7 +30,6 @@ public class BattleManager : MonoBehaviour
 
 public enum BattleState
 {
-    SelectPartyMember,
-    SelectAction,
-    SelectTarget
+    SelectUnit,
+    UnitSelected
 }

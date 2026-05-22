@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -9,10 +11,15 @@ public class MouseController : MonoBehaviour
     public static MouseController i;
     private PathFinder pathFinder;
 
-    private OverlayTile cachedTile;
+    private OverlayTile hoveredTile; //the tile that the mouse is currently hovering over
+    [SerializeField] private OverlayTile clickedTile; //the last tile that was left clicked
     public event Action<BattleState> updateBattleState;
+
+    //unit movement fields
+    public FieldCharacter characterToMove; //the last l-clicked fieldCharacter. Right clicking a tile will move it.
+    private OverlayTile characterToMoveSource; //the tile which the characterToMove resides.
     #endregion
-    
+
     void Awake()
     {
         i = this;
@@ -30,10 +37,10 @@ public class MouseController : MonoBehaviour
         if (focusedTileHit.HasValue)
         {
             GameObject overlayTile = focusedTileHit.Value.collider.gameObject;
-            cachedTile = overlayTile.GetComponent<OverlayTile>(); //assign the cached tile test
+            hoveredTile = overlayTile.GetComponent<OverlayTile>(); //assign the cached tile test
             transform.position = overlayTile.transform.position;
 
-            if(cachedTile != null)
+            if (hoveredTile != null)
             {
                 HandleFocusedTile(battleState);
             }
@@ -43,24 +50,44 @@ public class MouseController : MonoBehaviour
     {
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
-            cachedTile?.ShowTile();
+            clickedTile = hoveredTile;
+            clickedTile?.ShowTile();
 
             //see if there is a resting object.
-            if (cachedTile.RestingObject != null)
+            if (clickedTile.RestingObject != null)
             {
                 //if so, make it display in the worldObjectPreviewUI
-                WorldObjectPreviewUI.i.displayObject(cachedTile.RestingObject);
+                WorldObjectPreviewUI.i.displayObject(clickedTile.RestingObject);
 
                 //if it is a fieldCharacter party-controlled, and the battlestate is SelectPartyMember, select it and update the battlemanager's state.
+                updateBattleState?.Invoke(BattleState.UnitSelected);
+
+                if (clickedTile.RestingObject is FieldCharacter fieldCharacter && fieldCharacter.PlayerControlled) //check if the resting object is a field character. If so, store its casted version as characterToMove
+                {
+                    characterToMove = fieldCharacter;
+                    characterToMoveSource = clickedTile;
+                }
+                else
+                {
+                    //another tile was clicked on
+                    characterToMove = null;
+                    characterToMoveSource = null;
+                }
             }
             else
             {
                 WorldObjectPreviewUI.i.hideMenu();
             }
         }
-        if (Mouse.current.rightButton.wasReleasedThisFrame && cachedTile != null)
+        if (Mouse.current.rightButton.wasReleasedThisFrame && hoveredTile != null)
         {
-            
+            //check if there is a chraracterToMove, and if this square is empty. Then move the unit if there is a path.
+            //TODO: if the characterToMove is a ranged unit, then check line of sight logic or something. Would just be an else statement or something
+            if (characterToMove != null && hoveredTile.RestingObject == null)
+            {
+                //make the move order for the characterToMove and make sure to handle the restingObject logic.
+                StartCoroutine(MoveCharacter());
+            }
         }
     }
     public RaycastHit2D? GetFocusedOnTile()
@@ -75,5 +102,31 @@ public class MouseController : MonoBehaviour
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Moves a field character on the grid. Uses a coroutine to display the A* pathfinding arrows correctly.
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator MoveCharacter()
+    {
+        List<OverlayTile> path = pathFinder.FindPath(characterToMoveSource, hoveredTile);
+
+        //draw the pathfinding arrows and remove them after
+        MapManager.i.drawPathfindingArrows(path);
+
+        clickedTile.ClearRestingObject();
+        hoveredTile.SetRestingObject(characterToMove);
+
+        //move the character
+        yield return characterToMove.setMoveOrders(path);
+
+        //remove the pathfinding arrows
+        MapManager.i.destroyPathfindingArrows();
+        
+        //null out leftover data
+        clickedTile = null;
+        characterToMove = null;
+        characterToMoveSource = null;
     }
 }
