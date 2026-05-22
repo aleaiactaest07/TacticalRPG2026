@@ -10,30 +10,27 @@ public class DestructibleObject : MonoBehaviour, ObjectHP
     private SpriteRenderer spriteRenderer => gameObject.GetComponent<SpriteRenderer>();
     [SerializeField] string objectName;
     [SerializeField] string objectDescription;
-    [SerializeField] int objectHealth;
+    [SerializeField] int maxHealth;
+    private int currentHealth;
     [SerializeField] SpriteEffect destructionEffect;
     [SerializeField] Vector2 startingPosition; //TODO: remove this field when proc gen is added
     [SerializeField] Vector2 positionalOffset;
     [SerializeField] bool canWalkThrough; //if an object can be walked through in pathfinding
     private OverlayTile tilePosition;
-
-    public string exposeObjectInfo(out Sprite windowSprite, out string description)
+    void Start()
     {
-        description = objectDescription;
-        windowSprite = spriteRenderer.sprite;
-        return objectName;
+        currentHealth = maxHealth;
+        PlaceObjectOnGrid(startingPosition);
     }
-
     public void onLeftClick()
     {
         StartCoroutine(TakeDamage(20));
     }
-
     public IEnumerator TakeDamage(int taken)
     {
-        objectHealth = math.max(0, objectHealth - taken);
+        currentHealth = math.max(0, currentHealth - taken);
 
-        if (objectHealth == 0)
+        if (currentHealth == 0)
         {
             Debug.Log("Destructible object destroyed");
             //cause the destruction effect to take place on this sprite only
@@ -43,7 +40,6 @@ public class DestructibleObject : MonoBehaviour, ObjectHP
             Destroy(this.gameObject);
         }
     }
-
     private void PlaceObjectOnGrid(Vector2 tilePosition)
     {
         if (!MapManager.i.TryGetOverlayTile(tilePosition, out OverlayTile currentTile))
@@ -60,13 +56,17 @@ public class DestructibleObject : MonoBehaviour, ObjectHP
         transform.position = (Vector2)currentTile.transform.position + positionalOffset;
     }
 
-    void Start()
-    {
-        PlaceObjectOnGrid(startingPosition);
-    }
-
-    public bool allowPassthrough(FieldCharacter passing)
+    public bool AllowPassthrough(FieldCharacter passing)
     {
         return canWalkThrough;
+    }
+
+    public string exposeObjectInfo(out Sprite windowSprite, out string description, out float healthPercentage, out int maxHealth)
+    {
+        description = objectDescription;
+        windowSprite = spriteRenderer.sprite;
+        healthPercentage = (float)currentHealth / (float)this.maxHealth;
+        maxHealth = this.maxHealth;
+        return objectName;
     }
 }

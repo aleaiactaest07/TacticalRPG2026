@@ -16,13 +16,15 @@ public class FieldCharacter : MonoBehaviour, ObjectHP
     public string unitDisplayName {get; private set;} //determined from province of recruitment probably? like 2nd Dolebin Archers
     [SerializeField] CharacterSpriteHandler spriteHandler;
     public CharacterSpriteHandler SpriteHandler => spriteHandler;
-
     [SerializeField] UnitBase defaultBase;
     private Unit unit;
+    public int MaxUnitHP => unit.vitality;
+    public int UnitHP {get; private set;}
     public bool PlayerControlled; //make private set later
     private static Vector2 positionalOffset = new Vector2(0, 0.25f); //change to make it so character positions reflect properly on the isometric grid
     #endregion
     #region Setup
+    //TODO: change in place of selecting deployment area later in development
     void Start()
     {
         SetupUnit(defaultBase, 4 * Vector2.one);
@@ -32,6 +34,8 @@ public class FieldCharacter : MonoBehaviour, ObjectHP
         unit = new Unit(uBase);
         internalCharacterName = uBase.UnitName; //bubbled up 
         spriteHandler.Setup(uBase.CombatSprites);
+
+        UnitHP = MaxUnitHP; //TODO: change to be carryover from campaign map
 
         SetTilePosition(tilePosition);
     }
@@ -71,6 +75,7 @@ public class FieldCharacter : MonoBehaviour, ObjectHP
         yield return FollowPath();
     }
     [SerializeField] private float moveSpeed = 6f;
+    [SerializeField] private AnimationCurve movementEase = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
     private IEnumerator FollowPath(){ //coroutine to follow a path
         if (movementOrders == null || movementOrders.Count == 0)
         {
@@ -95,7 +100,8 @@ public class FieldCharacter : MonoBehaviour, ObjectHP
 
             while (elapsedTime < moveDuration) //the actual lerp
             {
-                transform.position = Vector3.Lerp(startPosition, targetPosition, elapsedTime / moveDuration);
+                float normalizedTime = Mathf.Clamp01(elapsedTime / moveDuration);
+                transform.position = Vector3.Slerp(startPosition, targetPosition, movementEase.Evaluate(normalizedTime));
                 elapsedTime += Time.deltaTime;
                 yield return null;
             }
@@ -108,10 +114,12 @@ public class FieldCharacter : MonoBehaviour, ObjectHP
     }
     #endregion
     #region MapObject and HP implementation
-    public string exposeObjectInfo(out Sprite windowSprite, out string description)
+    public string exposeObjectInfo(out Sprite windowSprite, out string description, out float healthPercentage, out int maxHealth)
     {
         windowSprite = unit._base.PortraitSprite;
         description = unit._base.UnitDescription;
+        healthPercentage = (float)UnitHP / (float) MaxUnitHP;
+        maxHealth = (int)MaxUnitHP;
         return unit._base.UnitName;
     }
     public IEnumerator TakeDamage(int taken)
@@ -119,9 +127,13 @@ public class FieldCharacter : MonoBehaviour, ObjectHP
         throw new NotImplementedException();
     }
 
-    public bool allowPassthrough(FieldCharacter passing)
+    public bool AllowPassthrough(FieldCharacter passing)
     {
         return passing.PlayerControlled == this.PlayerControlled; //if both are playercontrolled of both are not.
+    }
+
+    private void FieldUnitDeath(){
+        
     }
 
     #endregion

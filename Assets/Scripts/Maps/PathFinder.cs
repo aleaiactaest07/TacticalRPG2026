@@ -30,7 +30,7 @@ public class PathFinder
 
             foreach(var neighbor in neighborTiles)
             {
-                if (neighbor.isBlocked || neighbor.RestingObject != null || closedList.Contains(neighbor)) //TODO: put elevation differences, as well as passthrough implementation
+                if (neighbor.isBlocked || neighbor.RestingObject != null || closedList.Contains(neighbor)) //TODO: put elevation differences, as well as passthrough implementation for friendly units
                 {
                     continue;   
                 }

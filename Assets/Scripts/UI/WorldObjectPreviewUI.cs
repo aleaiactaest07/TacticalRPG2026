@@ -10,6 +10,8 @@ public class WorldObjectPreviewUI : MonoBehaviour
     [SerializeField] Image portraitRenderer;
     [SerializeField] TMP_Text headerText;
     [SerializeField] TMP_Text descriptionText;
+    [SerializeField] Image hpBarFill; //the red fill of the info bar HP fill
+    [SerializeField] TMP_Text healthText;
 
     void Awake()
     {
@@ -23,11 +25,15 @@ public class WorldObjectPreviewUI : MonoBehaviour
     {
         Sprite portrait;
         string description;
-
-        headerText.text = mapObject.exposeObjectInfo(out portrait, out description); //assigns all datatypes without constructing a new class or multiple getters
+        float healthPercentage;
+        int maxHealth;
+        headerText.text = mapObject.exposeObjectInfo(out portrait, out description, out healthPercentage, out maxHealth); //assigns all datatypes without constructing a new class or multiple getters
 
         portraitRenderer.sprite = portrait;
         descriptionText.text = description;
+
+        hpBarFill.rectTransform.localScale = new Vector3(healthPercentage, 1, 1); //set the fill to match the current HP value
+        healthText.text = $"{(int)(healthPercentage * maxHealth)}/{maxHealth} HP"; //set the text value of the health text
 
         graphicsParent.gameObject.SetActive(true);
     }
