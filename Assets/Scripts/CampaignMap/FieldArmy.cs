@@ -4,6 +4,16 @@ using UnityEngine;
 public class FieldArmy : MonoBehaviour
 {
     private List<CampaignUnit> units;
+    public Region currentRegion {get; private set;}
+
+    /// <summary>
+    /// updates the current region the unit is in.
+    /// </summary>
+    /// <param name="newRegion"></param>
+    public void UpdateCurrentRegion(Region newRegion)
+    {
+        currentRegion = newRegion;    
+    }
 
     /// <summary>
     /// sums up the individual maintenance costs of every unit in the army.
