@@ -12,11 +12,16 @@ public class CursorHandler : MonoBehaviour
     {
         if(i==null) i = this;
     }
+    
     public void UpdateCursor(CursorState cursorState)
     {
         this.cursorState = cursorState;
         Cursor.SetCursor(staticCursors[(int)this.cursorState], hotSpot, cursorMode); //cast the cursorstate into an int to find the texture index.
     }
+    
+    /// <summary>
+    /// place logic correlating to animated cursors here.
+    /// </summary>
     void Update()
     {
         

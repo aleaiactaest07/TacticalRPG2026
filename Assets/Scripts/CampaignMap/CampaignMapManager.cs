@@ -8,7 +8,31 @@ public class CampaignMapManager : MonoBehaviour
     [SerializeField] List<MapFactionBase> factionBases;
     private List<MapFaction> factions;
     private MapFaction playerFaction;
-    
+
+    private Region highlightedRegion;
+
+    #region Helper Scripts
+    [SerializeField] CampaignUI campaignUI;
+    #endregion
+
+    void Awake()
+    {
+        if(i==null)
+            i = this;
+    }
+
+    void Update()
+    {
+        //handles the highlightedregion logic
+
+    }
+
+    public void UpdateRegion(Region region)
+    {
+        highlightedRegion = region;
+        campaignUI.updateHighlightedRegionUI(region);
+    }
+
     /// <summary>
     /// sets up a campaign, passing the factionCode of the player faction.
     /// </summary>

@@ -6,7 +6,7 @@ public class MapFaction
     public MapFactionBase fBase {get; private set;}
     public string DisplayName => fBase.name;
     public List<Region> ownedRegions {get; private set;}
-
+    public List<FieldArmy> fieldArmies {get; private set;}
     /// <summary>
     /// Initializes a MapFaction using its base.
     /// </summary>
@@ -21,6 +21,7 @@ public class MapFaction
         ownedRegions.Add(region); //add to the list of the 
         region.UpdateOwner(this); //update the owner on the region's end
     }
+    
     public void LoseRegion(Region region)
     {
         if (ownedRegions.Contains(region))

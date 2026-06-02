@@ -244,6 +244,7 @@ public class MapManager : MonoBehaviour
 
                 if (!isFirstTile && currentKey != end && currentTile.RestingObject != null)
                 {
+                    CursorHandler.i.UpdateCursor(CursorState.LOSX);
                     break;
                 }
             }
@@ -270,6 +271,7 @@ public class MapManager : MonoBehaviour
             isFirstTile = false;
         }
 
+        CursorHandler.i.UpdateCursor(CursorState.LOSCheck);
         return lineTiles;
     }
 }

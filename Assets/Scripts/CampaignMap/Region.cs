@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(SpriteRenderer))] //require a spriterenderer on every Region.
 public class Region : MonoBehaviour
@@ -8,7 +9,7 @@ public class Region : MonoBehaviour
     [SerializeField] private string regionName;
     [SerializeField] List<Region> borderingRegions; //the list of regions that are accessible to this one.
     public FieldArmy occupyingArmy {get; private set;}
-    [SerializeField] private SpriteRenderer regionRenderer;
+    private SpriteRenderer regionRenderer;
     public string RegionCode => regionCode;
     public string RegionName => regionName;
     public MapFaction owner {get; private set;}
@@ -19,6 +20,13 @@ public class Region : MonoBehaviour
     public void InitializeRegion()
     {
         regionRenderer = GetComponent<SpriteRenderer>();
+
+        regionRenderer.color = Color.forestGreen;
+    }
+
+    void Start()
+    {
+        InitializeRegion();
     }
 
     /// <summary>
@@ -40,6 +48,11 @@ public class Region : MonoBehaviour
         owner = faction;
 
         UpdateRegionColor(owner.fBase.MapColor);
+    }
+
+    public void OnMouseEnter()
+    {
+        CampaignMapManager.i.UpdateRegion(this); //update the current highlighted region
     }
 }
 

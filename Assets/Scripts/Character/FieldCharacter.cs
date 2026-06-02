@@ -76,7 +76,9 @@ public class FieldCharacter : MonoBehaviour, ObjectHP
     }
     [SerializeField] private float moveSpeed = 6f;
     [SerializeField] private AnimationCurve movementEase = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
-    private IEnumerator FollowPath(){ //coroutine to follow a path
+    private IEnumerator FollowPath()
+    {
+         //coroutine to follow a path
         if (movementOrders == null || movementOrders.Count == 0)
         {
             yield break; //early termination
