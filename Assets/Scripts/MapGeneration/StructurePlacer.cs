@@ -7,6 +7,8 @@ using UnityEngine.Tilemaps;
 /// </summary>
 public class StructurePlacer : MonoBehaviour
 {
+    public static StructurePlacer i;
+
     [Header("Tilemaps")]
     [Tooltip("Place the scene tilemaps here, where index 0 is structure layer 0, etc.")]
     [SerializeField] List<Tilemap> targetTileMaps;
@@ -106,5 +108,38 @@ public class StructurePlacer : MonoBehaviour
     private void testPlacement()
     {
         PlaceStructure(testStructure, testOrigin);
+    }
+    
+    [ContextMenu("Clear All Layers")]
+    private void clearTestTilemaps()
+    {
+        if (targetTileMaps == null || targetTileMaps.Count == 0)
+        {
+            Debug.LogWarning("No target tilemaps assigned to clear.");
+            return;
+        }
+
+        foreach (Tilemap tilemap in targetTileMaps)
+        {
+            if (tilemap == null)
+            {
+                continue;
+            }
+
+            tilemap.ClearAllTiles();
+
+#if UNITY_EDITOR
+            UnityEditor.EditorUtility.SetDirty(tilemap);
+#endif
+        }
+    }
+    void Awake()
+    {
+        if (i == null) i = this;
+        else
+        {
+            this.enabled = false; //disable this component if another one already exists.
+            Debug.LogWarning("Duplicate StructurePlacer instance found. Please delete the second StructurePlacer, developer!");
+        }
     }
 }
