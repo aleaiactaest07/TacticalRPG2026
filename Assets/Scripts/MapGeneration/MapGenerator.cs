@@ -8,7 +8,7 @@ using UnityEngine.Tilemaps;
 [RequireComponent(typeof(StructurePlacer))]
 public class ProceduralCityGenerator : MonoBehaviour
 {
-    public enum CellType { Empty, River, Wall, Gate, Road, Building }
+    public enum CellType { Empty, River, Wall, Gate, Road, Building, Tower }
     public enum RiverDirection { North, NorthEast, East, SouthEast, South, SouthWest, West, NorthWest }
 
     [Header("City Dimensions (Must be multiples of 4)")]
@@ -29,10 +29,18 @@ public class ProceduralCityGenerator : MonoBehaviour
     [Header("4x4 Chunk Data")]
     public StructureData riverChunk; //4x4 water chunk for the river
     public StructureData wallChunk; //1x1 chunk for wall segments
+    public StructureData towerChunk; //4x4 chunk used for wall towers
     public StructureData gatehouseChunk; //chunk used for the gatehouse structure
+    public StructureData invertedGatehouseChunk; //chunk used on the left/right gatehouses.
     public StructureData roadChunk; //4x4 chunk for the large road
     public StructureData sideRoadChunk; //1x1 chunk that connects the main roads to placed structures.
     public StructureData bridgeChunk; //4x4 for the road crossing over the river.
+
+    [Tooltip("How many tiles to skip between wall tower placements. Values are snapped to the 4x4 grid.")]
+    [Min(4)] public int towerSpacing = 16;
+
+    [Tooltip("If enabled, places additional towers at regular intervals along the walls.")]
+    public bool enableIncrementalTowers = true;
 
     [Header("Wall Outcroppings")]
     public bool enableOutcroppings = true;
@@ -414,7 +422,7 @@ public class ProceduralCityGenerator : MonoBehaviour
 
             if (y >= midY && y < midY + 4)
             {
-                if (y == midY) MarkGridAndQueue(minX, y, 4, 4, CellType.Gate, gatehouseChunk);
+                if (y == midY) MarkGridAndQueue(minX, y, 4, 4, CellType.Gate, invertedGatehouseChunk != null ? invertedGatehouseChunk : gatehouseChunk);
                 prevX_Left = minX;
                 continue;
             }
@@ -442,7 +450,7 @@ public class ProceduralCityGenerator : MonoBehaviour
 
             if (y >= midY && y < midY + 4)
             {
-                if (y == midY) MarkGridAndQueue(maxX, y, 4, 4, CellType.Gate, gatehouseChunk);
+                if (y == midY) MarkGridAndQueue(maxX, y, 4, 4, CellType.Gate, invertedGatehouseChunk != null ? invertedGatehouseChunk : gatehouseChunk);
                 prevX_Right = maxX;
                 continue;
             }
@@ -461,6 +469,58 @@ public class ProceduralCityGenerator : MonoBehaviour
             if (cityGrid[currentX, y] != CellType.River) MarkGridAndQueue(currentX, y, 1, 1, CellType.Wall, wallChunk);
             prevX_Right = currentX;
         }
+
+        GenerateWallTowers(minX, maxX, minY, maxY, midX, midY);
+    }
+
+    private void GenerateWallTowers(int minX, int maxX, int minY, int maxY, int midX, int midY)
+    {
+        if (towerChunk == null) return;
+
+        int spacing = Mathf.Max(4, towerSpacing);
+        spacing -= spacing % 4;
+        if (spacing < 4) spacing = 4;
+
+        PlaceTower(minX, minY);
+        PlaceTower(maxX, minY);
+        PlaceTower(minX, maxY);
+        PlaceTower(maxX, maxY);
+
+        if (!enableIncrementalTowers) return;
+
+        for (int x = minX + spacing; x < maxX; x += spacing)
+        {
+            if (x >= midX && x < midX + 4) continue;
+            PlaceTower(x, minY);
+            PlaceTower(x, maxY);
+        }
+
+        for (int y = minY + spacing; y < maxY; y += spacing)
+        {
+            if (y >= midY && y < midY + 4) continue;
+            PlaceTower(minX, y);
+            PlaceTower(maxX, y);
+        }
+    }
+
+    private void PlaceTower(int startX, int startY)
+    {
+        if (towerChunk == null) return;
+
+        for (int x = startX; x < startX + 4; x++)
+        {
+            for (int y = startY; y < startY + 4; y++)
+            {
+                if (x < 0 || y < 0 || x >= cityWidth || y >= cityLength) return;
+
+                if (cityGrid[x, y] == CellType.River || cityGrid[x, y] == CellType.Gate || cityGrid[x, y] == CellType.Road || cityGrid[x, y] == CellType.Building || cityGrid[x, y] == CellType.Tower)
+                {
+                    return;
+                }
+            }
+        }
+
+        MarkGridAndQueue(startX, startY, 4, 4, CellType.Tower, towerChunk);
     }
 
     private void GenerateMainRoads()
