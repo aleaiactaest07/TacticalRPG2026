@@ -135,6 +135,34 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""BattleBinds"",
+            ""id"": ""687cf5f4-9fef-4b28-b263-1bca0168b5a2"",
+            ""actions"": [
+                {
+                    ""name"": ""ToggleGroup"",
+                    ""type"": ""Button"",
+                    ""id"": ""66cfeccd-b60f-4298-99bd-95b0b65bc5bf"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""f89345a6-4967-403c-a2a9-9ae8b78b0bda"",
+                    ""path"": ""<Keyboard>/g"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToggleGroup"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -204,11 +232,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Scroll = m_Player.FindAction("Scroll", throwIfNotFound: true);
         m_Player_MiddleMouseButton = m_Player.FindAction("Middle Mouse Button", throwIfNotFound: true);
+        // BattleBinds
+        m_BattleBinds = asset.FindActionMap("BattleBinds", throwIfNotFound: true);
+        m_BattleBinds_ToggleGroup = m_BattleBinds.FindAction("ToggleGroup", throwIfNotFound: true);
     }
 
     ~@InputSystem_Actions()
     {
         UnityEngine.Debug.Assert(!m_Player.enabled, "This will cause a leak and performance issues, InputSystem_Actions.Player.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_BattleBinds.enabled, "This will cause a leak and performance issues, InputSystem_Actions.BattleBinds.Disable() has not been called.");
     }
 
     /// <summary>
@@ -387,6 +419,102 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     /// Provides a new <see cref="PlayerActions" /> instance referencing this action map.
     /// </summary>
     public PlayerActions @Player => new PlayerActions(this);
+
+    // BattleBinds
+    private readonly InputActionMap m_BattleBinds;
+    private List<IBattleBindsActions> m_BattleBindsActionsCallbackInterfaces = new List<IBattleBindsActions>();
+    private readonly InputAction m_BattleBinds_ToggleGroup;
+    /// <summary>
+    /// Provides access to input actions defined in input action map "BattleBinds".
+    /// </summary>
+    public struct BattleBindsActions
+    {
+        private @InputSystem_Actions m_Wrapper;
+
+        /// <summary>
+        /// Construct a new instance of the input action map wrapper class.
+        /// </summary>
+        public BattleBindsActions(@InputSystem_Actions wrapper) { m_Wrapper = wrapper; }
+        /// <summary>
+        /// Provides access to the underlying input action "BattleBinds/ToggleGroup".
+        /// </summary>
+        public InputAction @ToggleGroup => m_Wrapper.m_BattleBinds_ToggleGroup;
+        /// <summary>
+        /// Provides access to the underlying input action map instance.
+        /// </summary>
+        public InputActionMap Get() { return m_Wrapper.m_BattleBinds; }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
+        public void Enable() { Get().Enable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
+        public void Disable() { Get().Disable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
+        public bool enabled => Get().enabled;
+        /// <summary>
+        /// Implicitly converts an <see ref="BattleBindsActions" /> to an <see ref="InputActionMap" /> instance.
+        /// </summary>
+        public static implicit operator InputActionMap(BattleBindsActions set) { return set.Get(); }
+        /// <summary>
+        /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <param name="instance">Callback instance.</param>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
+        /// </remarks>
+        /// <seealso cref="BattleBindsActions" />
+        public void AddCallbacks(IBattleBindsActions instance)
+        {
+            if (instance == null || m_Wrapper.m_BattleBindsActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_BattleBindsActionsCallbackInterfaces.Add(instance);
+            @ToggleGroup.started += instance.OnToggleGroup;
+            @ToggleGroup.performed += instance.OnToggleGroup;
+            @ToggleGroup.canceled += instance.OnToggleGroup;
+        }
+
+        /// <summary>
+        /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <remarks>
+        /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
+        /// </remarks>
+        /// <seealso cref="BattleBindsActions" />
+        private void UnregisterCallbacks(IBattleBindsActions instance)
+        {
+            @ToggleGroup.started -= instance.OnToggleGroup;
+            @ToggleGroup.performed -= instance.OnToggleGroup;
+            @ToggleGroup.canceled -= instance.OnToggleGroup;
+        }
+
+        /// <summary>
+        /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="BattleBindsActions.UnregisterCallbacks(IBattleBindsActions)" />.
+        /// </summary>
+        /// <seealso cref="BattleBindsActions.UnregisterCallbacks(IBattleBindsActions)" />
+        public void RemoveCallbacks(IBattleBindsActions instance)
+        {
+            if (m_Wrapper.m_BattleBindsActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        /// <summary>
+        /// Replaces all existing callback instances and previously registered input action callbacks associated with them with callbacks provided via <param cref="instance" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
+        /// </remarks>
+        /// <seealso cref="BattleBindsActions.AddCallbacks(IBattleBindsActions)" />
+        /// <seealso cref="BattleBindsActions.RemoveCallbacks(IBattleBindsActions)" />
+        /// <seealso cref="BattleBindsActions.UnregisterCallbacks(IBattleBindsActions)" />
+        public void SetCallbacks(IBattleBindsActions instance)
+        {
+            foreach (var item in m_Wrapper.m_BattleBindsActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_BattleBindsActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    /// <summary>
+    /// Provides a new <see cref="BattleBindsActions" /> instance referencing this action map.
+    /// </summary>
+    public BattleBindsActions @BattleBinds => new BattleBindsActions(this);
     private int m_KeyboardMouseSchemeIndex = -1;
     /// <summary>
     /// Provides access to the input control scheme.
@@ -473,5 +601,20 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnMiddleMouseButton(InputAction.CallbackContext context);
+    }
+    /// <summary>
+    /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "BattleBinds" which allows adding and removing callbacks.
+    /// </summary>
+    /// <seealso cref="BattleBindsActions.AddCallbacks(IBattleBindsActions)" />
+    /// <seealso cref="BattleBindsActions.RemoveCallbacks(IBattleBindsActions)" />
+    public interface IBattleBindsActions
+    {
+        /// <summary>
+        /// Method invoked when associated input action "ToggleGroup" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnToggleGroup(InputAction.CallbackContext context);
     }
 }

@@ -49,6 +49,34 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "BattleBinds",
+            "id": "687cf5f4-9fef-4b28-b263-1bca0168b5a2",
+            "actions": [
+                {
+                    "name": "ToggleGroup",
+                    "type": "Button",
+                    "id": "66cfeccd-b60f-4298-99bd-95b0b65bc5bf",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "f89345a6-4967-403c-a2a9-9ae8b78b0bda",
+                    "path": "<Keyboard>/g",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ToggleGroup",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [
