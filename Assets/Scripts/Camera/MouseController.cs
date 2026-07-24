@@ -137,4 +137,10 @@ public class MouseController : MonoBehaviour
         characterToMove = null;
         characterToMoveSource = null;
     }
+    
+    //Checks a square from clickdrag selection and highlights all units in that region (later, those which belong to the player.)
+    public void HandleDragRange(Vector2 origin, Vector2 destination)
+    {
+                
+    }
 }

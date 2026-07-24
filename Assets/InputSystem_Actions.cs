@@ -148,6 +148,24 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Select"",
+                    ""type"": ""Button"",
+                    ""id"": ""3e639359-c141-4d38-9c7f-44c6da8d20cf"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Command"",
+                    ""type"": ""Button"",
+                    ""id"": ""b278fd74-5709-4a86-bc2f-56e275fee5c4"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -159,6 +177,28 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""ToggleGroup"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5fe1b608-7283-4a1b-b7cc-58130c5a1c16"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Select"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5e68950a-dba0-4dff-92bc-174320279371"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Command"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -235,6 +275,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         // BattleBinds
         m_BattleBinds = asset.FindActionMap("BattleBinds", throwIfNotFound: true);
         m_BattleBinds_ToggleGroup = m_BattleBinds.FindAction("ToggleGroup", throwIfNotFound: true);
+        m_BattleBinds_Select = m_BattleBinds.FindAction("Select", throwIfNotFound: true);
+        m_BattleBinds_Command = m_BattleBinds.FindAction("Command", throwIfNotFound: true);
     }
 
     ~@InputSystem_Actions()
@@ -424,6 +466,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_BattleBinds;
     private List<IBattleBindsActions> m_BattleBindsActionsCallbackInterfaces = new List<IBattleBindsActions>();
     private readonly InputAction m_BattleBinds_ToggleGroup;
+    private readonly InputAction m_BattleBinds_Select;
+    private readonly InputAction m_BattleBinds_Command;
     /// <summary>
     /// Provides access to input actions defined in input action map "BattleBinds".
     /// </summary>
@@ -439,6 +483,14 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "BattleBinds/ToggleGroup".
         /// </summary>
         public InputAction @ToggleGroup => m_Wrapper.m_BattleBinds_ToggleGroup;
+        /// <summary>
+        /// Provides access to the underlying input action "BattleBinds/Select".
+        /// </summary>
+        public InputAction @Select => m_Wrapper.m_BattleBinds_Select;
+        /// <summary>
+        /// Provides access to the underlying input action "BattleBinds/Command".
+        /// </summary>
+        public InputAction @Command => m_Wrapper.m_BattleBinds_Command;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -468,6 +520,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @ToggleGroup.started += instance.OnToggleGroup;
             @ToggleGroup.performed += instance.OnToggleGroup;
             @ToggleGroup.canceled += instance.OnToggleGroup;
+            @Select.started += instance.OnSelect;
+            @Select.performed += instance.OnSelect;
+            @Select.canceled += instance.OnSelect;
+            @Command.started += instance.OnCommand;
+            @Command.performed += instance.OnCommand;
+            @Command.canceled += instance.OnCommand;
         }
 
         /// <summary>
@@ -482,6 +540,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @ToggleGroup.started -= instance.OnToggleGroup;
             @ToggleGroup.performed -= instance.OnToggleGroup;
             @ToggleGroup.canceled -= instance.OnToggleGroup;
+            @Select.started -= instance.OnSelect;
+            @Select.performed -= instance.OnSelect;
+            @Select.canceled -= instance.OnSelect;
+            @Command.started -= instance.OnCommand;
+            @Command.performed -= instance.OnCommand;
+            @Command.canceled -= instance.OnCommand;
         }
 
         /// <summary>
@@ -616,5 +680,19 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnToggleGroup(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Select" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnSelect(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Command" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnCommand(InputAction.CallbackContext context);
     }
 }
