@@ -32,18 +32,14 @@ public class MouseController : MonoBehaviour
             return;
         }
 
-        var focusedTileHit = GetFocusedOnTile();
+        OverlayTile focusedTile = GetOverlayTileFromMousePos();
 
-        if (focusedTileHit.HasValue)
+        if (focusedTile != null)
         {
-            GameObject overlayTile = focusedTileHit.Value.collider.gameObject;
-            hoveredTile = overlayTile.GetComponent<OverlayTile>(); //assign the cached tile test
-            transform.position = overlayTile.transform.position;
+            transform.position = focusedTile.transform.position;
+            hoveredTile = focusedTile;
 
-            if (hoveredTile != null)
-            {
-                HandleFocusedTile(battleState);
-            }
+            HandleFocusedTile(battleState);
         }
     }
     private void HandleFocusedTile(BattleState battleState)
@@ -98,11 +94,49 @@ public class MouseController : MonoBehaviour
             updateBattleState?.Invoke(BattleState.CheckingLOS);
         }
     }
+    public OverlayTile GetOverlayTileFromMousePos()
+    {
+        var focusedTileHit = GetFocusedOnTile();
+        if(focusedTileHit.HasValue)
+        {
+            GameObject overlayTile = focusedTileHit.Value.collider.gameObject;
+            hoveredTile = overlayTile.GetComponent<OverlayTile>();
+
+            return hoveredTile;
+        }
+
+        return null;
+    }
+
+    public OverlayTile GetOverlayTileFromPosition(Vector2 position)
+    {
+        var focusedTileHit = GetTileFromPos(position);
+        
+        if(focusedTileHit.HasValue)
+        {
+            GameObject overlayTile = focusedTileHit.Value.collider.gameObject;
+            hoveredTile = overlayTile.GetComponent<OverlayTile>();
+
+            return hoveredTile;
+        }
+
+        return null;
+    }
     public RaycastHit2D? GetFocusedOnTile()
     {
         Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
 
-        RaycastHit2D[] hits = Physics2D.RaycastAll(mousePosition, Vector2.zero);
+        return GetTileFromPos(mousePosition);
+    }
+
+    /// <summary>
+    /// Helper function for GetFocusedOnTile.
+    /// </summary>
+    /// <param name="mousePos"></param>
+    /// <returns></returns>
+    private RaycastHit2D? GetTileFromPos(Vector2 mousePos)
+    {
+        RaycastHit2D[] hits = Physics2D.RaycastAll(mousePos, Vector2.zero);
 
         if (hits.Length > 0)
         {
@@ -138,9 +172,42 @@ public class MouseController : MonoBehaviour
         characterToMoveSource = null;
     }
     
-    //Checks a square from clickdrag selection and highlights all units in that region (later, those which belong to the player.)
-    public void HandleDragRange(Vector2 origin, Vector2 destination)
+    
+    /// <summary>
+    /// Checks a square from clickdrag selection and returns the list of all overlay tiles.
+    /// </summary>
+    /// <param name="origin"></param>
+    /// <param name="destination"></param>
+    /// <returns></returns>
+    public List<OverlayTile> HandleDragRange(Vector2 origin, Vector2 destination)
     {
-                
+        if (MapManager.i == null || MapManager.i.map == null)
+        {
+            return null;
+        }
+
+        Vector2 min = Vector2.Min(origin, destination);
+        Vector2 max = Vector2.Max(origin, destination);
+
+        List<OverlayTile> rectangleTiles = new List<OverlayTile>();
+
+        foreach (OverlayTile tile in MapManager.i.map.Values)
+        {
+            Vector3 tileScreenPosition = Camera.main.WorldToScreenPoint(tile.transform.position);
+
+            if (tileScreenPosition.x < min.x || tileScreenPosition.x > max.x)
+            {
+                continue;
+            }
+
+            if (tileScreenPosition.y < min.y || tileScreenPosition.y > max.y)
+            {
+                continue;
+            }
+
+            rectangleTiles.Add(tile);
+        }
+
+        return rectangleTiles; //returns the tiles that were highlighted that can be then filtered quickly using LINQ or something
     }
 }

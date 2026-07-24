@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -28,15 +29,15 @@ public class BattleUI : MonoBehaviour
         isSelecting = selecting;
         selectorBox.gameObject.SetActive(selecting);
 
-        if(selecting)
+        if (selecting)
         {
             //place the origin
             placeSelectorOrigin(currentMousePos);
         }
         else
         {
-            //the selection box was released, handle selection of units here. Find all tiles bound between the origin and mouse position and select all units in that region.
-            
+            //the selection box was released, handle selection of units here. Find all tiles bound between the origin and mouse position and select all units in that region
+            highlightAllUnitsInRegion(MouseController.i.HandleDragRange(selectorOrigin, currentMousePos));
         }
     }
 
@@ -68,6 +69,21 @@ public class BattleUI : MonoBehaviour
         if (isSelecting)
         {
             updateSelectorCorner();
+        }
+    }
+
+    void highlightAllUnitsInRegion(List<OverlayTile> tiles)
+    {
+        foreach (OverlayTile tile in tiles)
+        {
+            if (tile.RestingObject != null && tile.RestingObject is FieldCharacter)
+            {
+                FieldCharacter character = (FieldCharacter)tile.RestingObject;
+                if (character.PlayerControlled)
+                {
+                    tile.ShowTile(); //highlight the tile if there is a resting object
+                }
+            }
         }
     }
 }
