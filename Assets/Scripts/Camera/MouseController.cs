@@ -60,8 +60,7 @@ public class MouseController : MonoBehaviour
 
                 if (clickedTile.RestingObject is FieldCharacter fieldCharacter && fieldCharacter.PlayerControlled) //check if the resting object is a field character. If so, store its casted version as characterToMove
                 {
-                    characterToMove = fieldCharacter;
-                    characterToMoveSource = clickedTile;
+                    SetSelectedSingleUnit(fieldCharacter);
                 }
                 else
                 {
@@ -82,7 +81,7 @@ public class MouseController : MonoBehaviour
             if (characterToMove != null && hoveredTile.RestingObject == null)
             {
                 //make the move order for the characterToMove and make sure to handle the restingObject logic.
-                StartCoroutine(MoveCharacter());
+                StartCoroutine(MoveCharacter(characterToMove, hoveredTile));
             }
         }
         else if (battleState == BattleState.CheckingLOS && clickedTile != null && hoveredTile != null)
@@ -147,29 +146,24 @@ public class MouseController : MonoBehaviour
     }
 
     /// <summary>
-    /// Moves a field character on the grid. Uses a coroutine to display the A* pathfinding arrows correctly.
+    /// Moves a field character on the grid. Uses a coroutine to display the A* pathfinding arrows correctly. Adding parameters allows for multiple movements simultaneously.
     /// </summary>
     /// <returns></returns>
-    private IEnumerator MoveCharacter()
+    private IEnumerator MoveCharacter(FieldCharacter toMove, OverlayTile destination)
     {
-        List<OverlayTile> path = pathFinder.FindPath(characterToMoveSource, hoveredTile);
+        List<OverlayTile> path = pathFinder.FindPath(toMove.TilePosition, destination);
 
         //draw the pathfinding arrows and remove them after
         MapManager.i.drawPathfindingArrows(path);
 
-        clickedTile.ClearRestingObject();
-        hoveredTile.SetRestingObject(characterToMove);
+        toMove.TilePosition.ClearRestingObject();
+        destination.SetRestingObject(toMove);
 
         //move the character
-        yield return characterToMove.setMoveOrders(path);
+        yield return toMove.setMoveOrders(path);
 
         //remove the pathfinding arrows
         MapManager.i.destroyPathfindingArrows();
-        
-        //null out leftover data
-        clickedTile = null;
-        characterToMove = null;
-        characterToMoveSource = null;
     }
     
     
@@ -209,5 +203,11 @@ public class MouseController : MonoBehaviour
         }
 
         return rectangleTiles; //returns the tiles that were highlighted that can be then filtered quickly using LINQ or something
+    }
+    
+    public void SetSelectedSingleUnit(FieldCharacter unit)
+    {
+        characterToMove = unit;
+        characterToMoveSource = unit.TilePosition;
     }
 }

@@ -32,10 +32,9 @@ public class SoldierGroup
     {
         groupNumber = newNumber;
     }
-
-    public SoldierGroup(int groupNumber, List<FieldCharacter> soldiers)
+    
+    public SoldierGroup(List<FieldCharacter> soldiers)
     {
-        this.groupNumber = groupNumber;
         AssignSoldiers(soldiers);
     }
 }

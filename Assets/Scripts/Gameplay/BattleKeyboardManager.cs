@@ -17,6 +17,6 @@ public class BattleKeyboardManager : MonoBehaviour
 
     private void ToggleGroup(InputAction.CallbackContext ctx)
     {
-        
+        BattleUI.i.AttemptGrouping();
     }
 }

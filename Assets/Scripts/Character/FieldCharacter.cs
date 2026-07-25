@@ -10,6 +10,7 @@ public class FieldCharacter : MonoBehaviour, ObjectHP
 {
     #region Fields
     private OverlayTile tilePosition;
+    public OverlayTile TilePosition => tilePosition;
     private OverlayTile targetTile;
     [SerializeField] List<OverlayTile> movementOrders;
     public string internalCharacterName { get; private set; }
@@ -25,9 +26,11 @@ public class FieldCharacter : MonoBehaviour, ObjectHP
     #endregion
     #region Setup
     //TODO: change in place of selecting deployment area later in development
+
+    [SerializeField] private Vector2Int defaultTilePosition = new Vector2Int(4, 4);
     void Start()
     {
-        SetupUnit(defaultBase, 4 * Vector2.one);
+        SetupUnit(defaultBase, defaultTilePosition);
     }
     public void SetupUnit(UnitBase uBase, Vector2 tilePosition)
     {
