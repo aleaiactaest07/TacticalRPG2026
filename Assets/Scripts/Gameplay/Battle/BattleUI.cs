@@ -46,6 +46,14 @@ public class BattleUI : MonoBehaviour
             {
                 MouseController.i.SetSelectedSingleUnit(selectedUnits[0]);
             }
+            else if (selectedUnits.Count > 1)
+            {
+                MouseController.i.SetSelectedUnits(selectedUnits);
+            }
+            else
+            {
+                MouseController.i.ClearSelectedUnits();
+            }
 
             if (selectedUnits.Count > 0)
             {

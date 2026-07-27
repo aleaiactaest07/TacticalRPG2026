@@ -8,6 +8,11 @@ public class PathFinder
     //return a list of tiles a path must go through to reach a set target.
     public List<OverlayTile> FindPath(OverlayTile source, OverlayTile target)
     {
+        return FindPath(source, target, null);
+    }
+
+    public List<OverlayTile> FindPath(OverlayTile source, OverlayTile target, HashSet<OverlayTile> ignoredTiles)
+    {
         List<OverlayTile> openList = new List<OverlayTile>(); //tiles we want to check in the next loop iteration
         List<OverlayTile> closedList = new List<OverlayTile>(); //tiles we do not need to recheck
         
@@ -30,7 +35,13 @@ public class PathFinder
 
             foreach(var neighbor in neighborTiles)
             {
-                if (neighbor.isBlocked || neighbor.RestingObject != null || closedList.Contains(neighbor)) //TODO: put elevation differences, as well as passthrough implementation for friendly units
+                if (closedList.Contains(neighbor))
+                {
+                    continue;
+                }
+
+                bool isIgnoredTile = ignoredTiles != null && ignoredTiles.Contains(neighbor);
+                if (!isIgnoredTile && (neighbor.isBlocked || neighbor.RestingObject != null)) //TODO: put elevation differences, as well as passthrough implementation for friendly units
                 {
                     continue;   
                 }

@@ -16,7 +16,7 @@ public class MouseController : MonoBehaviour
     public event Action<BattleState> updateBattleState;
 
     //unit movement fields
-    public FieldCharacter characterToMove; //the last l-clicked fieldCharacter. Right clicking a tile will move it.
+    public List<FieldCharacter> selectedCharacters; //the list of selected fieldCharacters. Right clicking a tile will move the formation.
     private OverlayTile characterToMoveSource; //the tile which the characterToMove resides.
     #endregion
 
@@ -24,6 +24,8 @@ public class MouseController : MonoBehaviour
     {
         i = this;
         pathFinder = new PathFinder();
+
+        selectedCharacters = new List<FieldCharacter>();
     }
     public void HandleUpdate(BattleState battleState)
     {
@@ -65,7 +67,7 @@ public class MouseController : MonoBehaviour
                 else
                 {
                     //another tile was clicked on
-                    characterToMove = null;
+                    selectedCharacters.Clear();
                     characterToMoveSource = null;
                 }
             }
@@ -76,12 +78,13 @@ public class MouseController : MonoBehaviour
         }
         else if (Mouse.current.rightButton.wasReleasedThisFrame && hoveredTile != null)
         {
-            //check if there is a chraracterToMove, and if this square is empty. Then move the unit if there is a path.
-            //TODO: if the characterToMove is a ranged unit, then check line of sight logic or something. Would just be an else statement or something
-            if (characterToMove != null && hoveredTile.RestingObject == null)
+            if (selectedCharacters.Count == 1 && hoveredTile.RestingObject == null)
             {
-                //make the move order for the characterToMove and make sure to handle the restingObject logic.
-                StartCoroutine(MoveCharacter(characterToMove, hoveredTile));
+                StartCoroutine(MoveCharacter(selectedCharacters[0], hoveredTile));
+            }
+            else if (selectedCharacters.Count > 1)
+            {
+                StartCoroutine(MoveFormation(selectedCharacters, hoveredTile));
             }
         }
         else if (battleState == BattleState.CheckingLOS && clickedTile != null && hoveredTile != null)
@@ -153,17 +156,152 @@ public class MouseController : MonoBehaviour
     {
         List<OverlayTile> path = pathFinder.FindPath(toMove.TilePosition, destination);
 
-        //draw the pathfinding arrows and remove them after
-        MapManager.i.drawPathfindingArrows(path);
+        yield return MoveCharacterAlongPath(toMove, destination, path, true, null);
+    }
+
+    private IEnumerator MoveCharacterAlongPath(FieldCharacter toMove, OverlayTile destination, List<OverlayTile> path, bool drawPathArrows, Action onComplete)
+    {
+        if (path == null)
+        {
+            yield break;
+        }
+
+        bool isStationaryMove = path.Count == 0 && toMove.TilePosition == destination;
+        if (path.Count == 0 && !isStationaryMove)
+        {
+            yield break;
+        }
+
+        if (drawPathArrows && path.Count > 0)
+        {
+            MapManager.i.drawPathfindingArrows(path);
+        }
 
         toMove.TilePosition.ClearRestingObject();
+
+        if (path.Count > 0)
+        {
+            yield return toMove.setMoveOrders(path);
+        }
+
         destination.SetRestingObject(toMove);
 
-        //move the character
-        yield return toMove.setMoveOrders(path);
+        if (drawPathArrows && path.Count > 0)
+        {
+            MapManager.i.destroyPathfindingArrows();
+        }
 
-        //remove the pathfinding arrows
-        MapManager.i.destroyPathfindingArrows();
+        onComplete?.Invoke();
+    }
+
+    private IEnumerator MoveFormation(List<FieldCharacter> units, OverlayTile destination)
+    {
+        if (!TryBuildFormationMovePlan(units, destination, out List<FormationMovePlan> movePlan))
+        {
+            yield break;
+        }
+
+        foreach (var unit in units)
+        {
+            unit.TilePosition.ClearRestingObject();
+        }
+
+        int remainingMoves = movePlan.Count;
+        foreach (var move in movePlan)
+        {
+            StartCoroutine(MoveCharacterAlongPath(move.Unit, move.TargetTile, move.Path, false, () => remainingMoves--));
+        }
+
+        while (remainingMoves > 0)
+        {
+            yield return null;
+        }
+    }
+
+    private bool TryBuildFormationMovePlan(List<FieldCharacter> units, OverlayTile destination, out List<FormationMovePlan> movePlan)
+    {
+        movePlan = new List<FormationMovePlan>();
+
+        if (units == null || units.Count == 0 || destination == null || MapManager.i == null)
+        {
+            return false;
+        }
+
+        HashSet<OverlayTile> selectedTiles = new HashSet<OverlayTile>(units.Where(unit => unit != null && unit.TilePosition != null).Select(unit => unit.TilePosition));
+
+        FieldCharacter originUnit = units
+            .Where(unit => unit != null && unit.TilePosition != null)
+            .OrderBy(unit => GetTileDistance(unit.TilePosition, destination))
+            .FirstOrDefault();
+
+        if (originUnit == null)
+        {
+            return false;
+        }
+
+        Vector2Int originLocation = originUnit.TilePosition.gridLocation;
+
+        foreach (FieldCharacter unit in units)
+        {
+            if (unit == null || unit.TilePosition == null)
+            {
+                return false;
+            }
+
+            Vector2Int offset = unit.TilePosition.gridLocation - originLocation;
+            Vector2Int targetLocation = destination.gridLocation + offset;
+
+            if (!MapManager.i.TryGetOverlayTile(targetLocation, out OverlayTile targetTile))
+            {
+                return false;
+            }
+
+            if (!IsFormationTargetAvailable(targetTile, selectedTiles))
+            {
+                return false;
+            }
+
+            List<OverlayTile> path = pathFinder.FindPath(unit.TilePosition, targetTile, selectedTiles);
+            if (path.Count == 0 && unit.TilePosition != targetTile)
+            {
+                return false;
+            }
+
+            movePlan.Add(new FormationMovePlan
+            {
+                Unit = unit,
+                TargetTile = targetTile,
+                Path = path
+            });
+        }
+
+        return true;
+    }
+
+    private bool IsFormationTargetAvailable(OverlayTile tile, HashSet<OverlayTile> selectedTiles)
+    {
+        if (tile == null || tile.isBlocked)
+        {
+            return false;
+        }
+
+        if (tile.RestingObject == null)
+        {
+            return true;
+        }
+
+        if (tile.RestingObject is FieldCharacter restingCharacter)
+        {
+            return selectedCharacters.Contains(restingCharacter) && selectedTiles.Contains(tile);
+        }
+
+        return false;
+    }
+
+    private int GetTileDistance(OverlayTile source, OverlayTile destination)
+    {
+        Vector2Int delta = source.gridLocation - destination.gridLocation;
+        return Mathf.Abs(delta.x) + Mathf.Abs(delta.y);
     }
     
     
@@ -207,7 +345,29 @@ public class MouseController : MonoBehaviour
     
     public void SetSelectedSingleUnit(FieldCharacter unit)
     {
-        characterToMove = unit;
+        selectedCharacters.Clear(); //if only a single unit is selected, clear the list and add the first one.
+
+        selectedCharacters.Add(unit);
         characterToMoveSource = unit.TilePosition;
+    }
+
+    public void SetSelectedUnits(List<FieldCharacter> units)
+    {
+        selectedCharacters.Clear();
+        selectedCharacters.AddRange(units.Where(unit => unit != null));
+        characterToMoveSource = selectedCharacters.Count > 0 ? selectedCharacters[0].TilePosition : null;
+    }
+
+    public void ClearSelectedUnits()
+    {
+        selectedCharacters.Clear();
+        characterToMoveSource = null;
+    }
+
+    private struct FormationMovePlan
+    {
+        public FieldCharacter Unit;
+        public OverlayTile TargetTile;
+        public List<OverlayTile> Path;
     }
 }
