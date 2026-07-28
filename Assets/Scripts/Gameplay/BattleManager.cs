@@ -32,6 +32,12 @@ public class BattleManager : MonoBehaviour
         battleState = currentStates.Peek();
     }
 
+    /// <summary>
+    /// Performs an attack from one unit to another.
+    /// </summary>
+    /// <param name="attacker">The unit performing the attack.</param>
+    /// <param name="receiver">The unit receiving the attack.</param>
+    /// <param name="attackType">The type of attack being performed.</param>
     private void PerformAttack(FieldCharacter attacker, ObjectHP receiver, AttackType attackType)
     {
         if(attackType == AttackType.Melee)
@@ -74,5 +80,7 @@ public enum BattleState
 public enum AttackType
 {
     Melee,
-    Ranged
+    Ranged,
+    None //placeholder for when the alt attack type for a unit is no different from the regular attack type.
+    //For example, archers' alt is a weak melee. Swordsmen do not have an alt, so theirs would be null.
 }

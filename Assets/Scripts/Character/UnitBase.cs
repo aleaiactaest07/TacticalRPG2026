@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -10,6 +11,11 @@ public class UnitBase : ScriptableObject
     [SerializeField] UnitType unitType;
     [SerializeField] CombatSpriteDepot combatSprites;
 
+    [Header("Weapons")]
+    [SerializeField] List<WeaponType> allowedPrimaryWeapons;
+    [SerializeField] Weapon basePrimaryWeapon;
+    [SerializeField] Weapon baseSecondaryWeapon;
+
     [Header("Panel View Data")]
     [TextArea(3, 5)][SerializeField] string unitDescription;
     [SerializeField] Sprite portraitSprite;
@@ -18,8 +24,6 @@ public class UnitBase : ScriptableObject
     [SerializeField] int morale;
     [SerializeField] int agility;
     [SerializeField] int strength;
-    [SerializeField] int dexterity;
-    [SerializeField] int tactics;
 
     [SerializeField] int unitMaintenance;
 
@@ -34,12 +38,14 @@ public class UnitBase : ScriptableObject
     public string UnitDescription { get { return unitDescription; } }
     public Sprite PortraitSprite { get { return portraitSprite; } }
 
+    public List<WeaponType> AllowedPrimaryWeapons { get { return allowedPrimaryWeapons; } }
+    public Weapon BasePrimaryWeapon { get { return basePrimaryWeapon; } }
+    public Weapon BaseSecondaryWeapon { get { return baseSecondaryWeapon; } }
+
     public int Vitality { get { return vitality; } }
     public int Morale { get { return morale; } }
     public int Agility { get { return agility; } }
     public int Strength { get { return strength; } }
-    public int Dexterity { get { return dexterity; } }
-    public int Tactics { get { return tactics; } }
     public int UnitMaintenance => unitMaintenance;
 
     public UnitArmor StartingArmor { get { return startingArmor; } }

@@ -3077,7 +3077,7 @@ MonoBehaviour:
   movementOrders: []
   spriteHandler: {fileID: 1261567933}
   defaultBase: {fileID: 11400000, guid: d16ef53d8a266a146a3384f80e9a73c6, type: 2}
-  PlayerControlled: 1
+  PlayerControlled: 0
   defaultTilePosition: {x: 2, y: 4}
   moveSpeed: 6
   movementEase:
@@ -45330,7 +45330,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CursorHighlight
   clickedTile: {fileID: 0}
-  characterToMove: {fileID: 0}
+  selectedCharacters: []
 --- !u!4 &1598553183
 Transform:
   m_ObjectHideFlags: 0

@@ -18,6 +18,8 @@ public class FieldCharacter : MonoBehaviour, ObjectHP
     [SerializeField] CharacterSpriteHandler spriteHandler;
     public CharacterSpriteHandler SpriteHandler => spriteHandler;
     [SerializeField] UnitBase defaultBase;
+    [SerializeField] UnitArmor unitArmor;
+    public UnitArmor UnitArmor => unitArmor;
     private Unit unit;
     public int MaxUnitHP => unit.vitality;
     public int UnitHP {get; private set;}
@@ -77,6 +79,7 @@ public class FieldCharacter : MonoBehaviour, ObjectHP
         movementOrders = tiles;
         yield return FollowPath();
     }
+
     [SerializeField] private float moveSpeed = 6f;
     [SerializeField] private AnimationCurve movementEase = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
     private IEnumerator FollowPath()

@@ -78,13 +78,26 @@ public class MouseController : MonoBehaviour
         }
         else if (Mouse.current.rightButton.wasReleasedThisFrame && hoveredTile != null)
         {
-            if (selectedCharacters.Count == 1 && hoveredTile.RestingObject == null)
+            if (hoveredTile.RestingObject == null)
             {
-                StartCoroutine(MoveCharacter(selectedCharacters[0], hoveredTile));
+                if (selectedCharacters.Count > 1)
+                {
+                    StartCoroutine(MoveFormation(selectedCharacters, hoveredTile));
+                }
+                if (selectedCharacters.Count == 1)
+                {
+                    StartCoroutine(MoveCharacter(selectedCharacters[0], hoveredTile));
+                }
             }
-            else if (selectedCharacters.Count > 1)
+            else if(hoveredTile.RestingObject is FieldCharacter restingCharacter && selectedCharacters.Count > 0)
             {
-                StartCoroutine(MoveFormation(selectedCharacters, hoveredTile));
+                //see if the resting object is another unit of a different affinity. If so, handle the attack logic.
+                if (!restingCharacter.PlayerControlled)
+                {
+                    //attack logic here
+                    Debug.Log($"Attacking {restingCharacter.name} with {selectedCharacters[0].name}");
+                }
+                
             }
         }
         else if (battleState == BattleState.CheckingLOS && clickedTile != null && hoveredTile != null)
@@ -99,7 +112,7 @@ public class MouseController : MonoBehaviour
     public OverlayTile GetOverlayTileFromMousePos()
     {
         var focusedTileHit = GetFocusedOnTile();
-        if(focusedTileHit.HasValue)
+        if (focusedTileHit.HasValue)
         {
             GameObject overlayTile = focusedTileHit.Value.collider.gameObject;
             hoveredTile = overlayTile.GetComponent<OverlayTile>();
@@ -113,8 +126,8 @@ public class MouseController : MonoBehaviour
     public OverlayTile GetOverlayTileFromPosition(Vector2 position)
     {
         var focusedTileHit = GetTileFromPos(position);
-        
-        if(focusedTileHit.HasValue)
+
+        if (focusedTileHit.HasValue)
         {
             GameObject overlayTile = focusedTileHit.Value.collider.gameObject;
             hoveredTile = overlayTile.GetComponent<OverlayTile>();
@@ -303,8 +316,8 @@ public class MouseController : MonoBehaviour
         Vector2Int delta = source.gridLocation - destination.gridLocation;
         return Mathf.Abs(delta.x) + Mathf.Abs(delta.y);
     }
-    
-    
+
+
     /// <summary>
     /// Checks a square from clickdrag selection and returns the list of all overlay tiles.
     /// </summary>
@@ -342,7 +355,7 @@ public class MouseController : MonoBehaviour
 
         return rectangleTiles; //returns the tiles that were highlighted that can be then filtered quickly using LINQ or something
     }
-    
+
     public void SetSelectedSingleUnit(FieldCharacter unit)
     {
         selectedCharacters.Clear(); //if only a single unit is selected, clear the list and add the first one.
