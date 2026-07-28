@@ -20,8 +20,6 @@ public class Unit
         
         agility = level + _base.Agility;
         strength = level + _base.Strength;
-        dexterity = level + _base.Dexterity;
-        tactics = level + _base.Tactics;
     }
 
     //compiled stats (not base)
