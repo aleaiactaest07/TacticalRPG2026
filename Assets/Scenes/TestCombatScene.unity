@@ -3077,6 +3077,11 @@ MonoBehaviour:
   movementOrders: []
   spriteHandler: {fileID: 1261567933}
   defaultBase: {fileID: 11400000, guid: d16ef53d8a266a146a3384f80e9a73c6, type: 2}
+  unitArmor:
+    plating: 0
+    padding: 0
+    mail: 0
+  unitWeapon: {fileID: 11400000, guid: 7376f079182533343acd716802a9ec8d, type: 2}
   PlayerControlled: 0
   defaultTilePosition: {x: 2, y: 4}
   moveSpeed: 6
@@ -46238,6 +46243,7 @@ GameObject:
   - component: {fileID: 1843530661}
   - component: {fileID: 1843530660}
   - component: {fileID: 1843530662}
+  - component: {fileID: 1843530663}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -46284,6 +46290,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e049b98ec0139b43ac6695786c41a38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BattleKeyboardManager
+--- !u!114 &1843530663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1843530659}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58a4df543682b05439f0f6b66941b1f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GlobalSettings
+  richDebugLogs: 1
 --- !u!1 &1859690192
 GameObject:
   m_ObjectHideFlags: 0
@@ -46988,6 +47007,11 @@ MonoBehaviour:
   movementOrders: []
   spriteHandler: {fileID: 2129949238}
   defaultBase: {fileID: 11400000, guid: d16ef53d8a266a146a3384f80e9a73c6, type: 2}
+  unitArmor:
+    plating: 1
+    padding: 1
+    mail: 1
+  unitWeapon: {fileID: 11400000, guid: 7376f079182533343acd716802a9ec8d, type: 2}
   PlayerControlled: 1
   defaultTilePosition: {x: 4, y: 4}
   moveSpeed: 6

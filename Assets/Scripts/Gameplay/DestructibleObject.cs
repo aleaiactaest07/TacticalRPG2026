@@ -24,9 +24,9 @@ public class DestructibleObject : MonoBehaviour, ObjectHP
     }
     public void onLeftClick()
     {
-        StartCoroutine(TakeDamage(20));
+        StartCoroutine(TakeDamage(20, DamageType.Blunt));
     }
-    public IEnumerator TakeDamage(int taken)
+    public IEnumerator TakeDamage(int taken, DamageType damageType)
     {
         currentHealth = math.max(0, currentHealth - taken);
 

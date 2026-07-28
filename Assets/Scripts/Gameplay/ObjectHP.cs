@@ -10,5 +10,5 @@ public interface ObjectHP : MapObject
     /// <summary>
     /// May cause a reduction in health, destruction with an animation, etc.
     /// </summary>
-    public IEnumerator TakeDamage(int taken);
+    public IEnumerator TakeDamage(int taken, DamageType damageType = DamageType.Blunt);
 }

@@ -33,16 +33,18 @@ public class BattleManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Performs an attack from one unit to another.
+    /// Performs an attack from one unit towards any object that can take damage (the ObjectHP interface)
     /// </summary>
     /// <param name="attacker">The unit performing the attack.</param>
     /// <param name="receiver">The unit receiving the attack.</param>
     /// <param name="attackType">The type of attack being performed.</param>
-    private void PerformAttack(FieldCharacter attacker, ObjectHP receiver, AttackType attackType)
+    public void PerformAttack(FieldCharacter attacker, ObjectHP receiver, AttackType attackType)
     {
         if(attackType == AttackType.Melee)
         {
-            
+            int attackerDamage = attacker.Unit.strength + attacker.UnitWeapon.BaseDamage;
+            receiver.TakeDamage(attackerDamage, attacker.UnitWeapon.DamageType);
+
         }
         else if(attackType == AttackType.Ranged)
         {

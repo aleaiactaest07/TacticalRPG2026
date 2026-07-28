@@ -95,7 +95,8 @@ public class MouseController : MonoBehaviour
                 if (!restingCharacter.PlayerControlled)
                 {
                     //attack logic here
-                    Debug.Log($"Attacking {restingCharacter.name} with {selectedCharacters[0].name}");
+                    if(GlobalEditorSettings.i.RichDebugLogs) Debug.Log($"Attacking {restingCharacter.name} with {selectedCharacters[0].name}");
+                    BattleManager.i.PerformAttack(selectedCharacters[0], restingCharacter, AttackType.Melee);
                 }
                 
             }

@@ -19,16 +19,19 @@ public class FieldCharacter : MonoBehaviour, ObjectHP
     public CharacterSpriteHandler SpriteHandler => spriteHandler;
     [SerializeField] UnitBase defaultBase;
     [SerializeField] UnitArmor unitArmor;
+    [SerializeField] Weapon unitWeapon;
     public UnitArmor UnitArmor => unitArmor;
+    public Weapon UnitWeapon => unitWeapon;
     private Unit unit;
+    public Unit Unit => unit;
     public int MaxUnitHP => unit.vitality;
     public int UnitHP {get; private set;}
     public bool PlayerControlled; //make private set later
     private static Vector2 positionalOffset = new Vector2(0, 0.25f); //change to make it so character positions reflect properly on the isometric grid
     #endregion
     #region Setup
-    //TODO: change in place of selecting deployment area later in development
 
+    //TODO: change in place of selecting deployment area later in development
     [SerializeField] private Vector2Int defaultTilePosition = new Vector2Int(4, 4);
     void Start()
     {
@@ -122,9 +125,42 @@ public class FieldCharacter : MonoBehaviour, ObjectHP
     }
     #endregion
     #region MapObject and HP implementation
-    public IEnumerator TakeDamage(int taken)
+    
+    /// <summary>
+    /// Function for taking damage for a FieldCharacter.
+    /// </summary>
+    /// <param name="baseDamage"></param>
+    /// <param name="damageType"></param>
+    /// <returns></returns>
+    public IEnumerator TakeDamage(int baseDamage, DamageType damageType)
     {
-        throw new NotImplementedException();
+        switch (damageType)
+        {
+            case DamageType.Blunt:
+                baseDamage -= unitArmor.padding;
+                break;
+            case DamageType.Slash:
+                baseDamage -= unitArmor.mail;
+                break;
+            case DamageType.Pierce:
+                baseDamage -= unitArmor.plating;
+                break;
+            default:
+                break;
+        }
+
+        if (baseDamage < 0) return null; //no damage taken if below armor threshold
+        
+        UnitHP -= baseDamage;
+        
+        if(GlobalEditorSettings.i.RichDebugLogs) Debug.Log($"{internalCharacterName} took {baseDamage} damage, remaining HP: {UnitHP}");
+
+        if(UnitHP <= 0)
+        {
+            UnitHP = 0;
+            FieldUnitDeath();
+        }
+        return null;
     }
 
     public bool AllowPassthrough(FieldCharacter passing)
@@ -133,7 +169,7 @@ public class FieldCharacter : MonoBehaviour, ObjectHP
     }
 
     private void FieldUnitDeath(){
-        
+        if(GlobalEditorSettings.i.RichDebugLogs) Debug.Log("Unit should die here");
     }
 
     public WorldObjectPreviewData exposeObjectInfo()

@@ -9,7 +9,7 @@ public class Unit
     public UnitBase _base {get; private set;} //this just means it can be accessed but not reassigned by another script (only internally by the constructor). Useful in all sorts of places.
     public Unit(UnitBase _base)
     {
-        this._base = _base;   
+        this._base = _base;
         calculateStats();
     }
 
