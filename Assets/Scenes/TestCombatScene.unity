@@ -3082,7 +3082,7 @@ MonoBehaviour:
     padding: 0
     mail: 0
   unitWeapon: {fileID: 11400000, guid: 7376f079182533343acd716802a9ec8d, type: 2}
-  PlayerControlled: 0
+  PlayerControlled: 1
   defaultTilePosition: {x: 2, y: 4}
   moveSpeed: 6
   movementEase:

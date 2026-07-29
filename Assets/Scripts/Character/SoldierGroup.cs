@@ -3,7 +3,8 @@ using UnityEngine;
 
 public class SoldierGroup
 {
-    private List<FieldCharacter> AssignedSoldiers = new List<FieldCharacter>();
+    private List<FieldCharacter> assignedSoldiers = new List<FieldCharacter>();
+    public List<FieldCharacter> AssignedSoldiers => assignedSoldiers;
     private bool inFormation = false;
 
     public int groupNumber {get; private set;}
@@ -15,9 +16,9 @@ public class SoldierGroup
 
     public void AssignSoldier(FieldCharacter soldier)
     {
-        if (!AssignedSoldiers.Contains(soldier))
+        if (!assignedSoldiers.Contains(soldier))
         {
-            AssignedSoldiers.Add(soldier);
+            assignedSoldiers.Add(soldier);
         }
     }
     public void AssignSoldiers(List<FieldCharacter> soldiers)

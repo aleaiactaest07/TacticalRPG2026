@@ -15,7 +15,10 @@ public class GroupUI : MonoBehaviour
         if (soldierGroups.Count < groupCap)
         {
             soldierGroups.Add(newGroup);
-             Instantiate(groupCardPrefab, graphicsParent.transform);
+            var groupCard = Instantiate(groupCardPrefab, graphicsParent.transform).GetComponent<GroupCard>();
+            groupCard.groupNumber = newGroup.groupNumber;
+
+            groupCard.onCardClicked += SelectGroup;
         }
     }
 
@@ -28,5 +31,14 @@ public class GroupUI : MonoBehaviour
     {
         unitsSelectedText.gameObject.SetActive(!cancel);
         unitsSelectedText.text = $"{n} units selected";
+    }
+
+    /// <summary>
+    /// Selects a group of units when a group card is clicked.
+    /// </summary>
+    private void SelectGroup(int groupNumber)
+    {
+        if(GlobalEditorSettings.i.RichDebugLogs) Debug.Log($"Group {groupNumber} selected");
+        MouseController.i.SetSelectedUnits(soldierGroups[groupNumber].AssignedSoldiers);
     }
 }
